@@ -1,0 +1,14 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+RUN pip install --no-cache-dir flask openai
+
+COPY app/ /app/app/
+COPY demo/ /app/demo/
+COPY prepare.py /app/prepare.py
+COPY dashboard/ /app/dashboard/
+
+EXPOSE 5050
+
+CMD ["python", "dashboard/app.py"]

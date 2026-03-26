@@ -1,0 +1,104 @@
+services:
+  polymarket-data:
+    build: .
+    container_name: polymarket-data
+    environment:
+      - KAGGLE_API_TOKEN=${KAGGLE_API_TOKEN}
+      - HTTP_PROXY=http://host.docker.internal:7890
+      - HTTPS_PROXY=http://host.docker.internal:7890
+      - PREDICTION_DIR=/app/prediction
+    volumes:
+      - ./prediction:/app/prediction
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile.dashboard
+    container_name: pm-dashboard
+    environment:
+      - SOURCE_AUTORESEARCH_DIR=/app/source_autoresearch
+      - HTTP_PROXY=http://host.docker.internal:7890
+      - HTTPS_PROXY=http://host.docker.internal:7890
+      - NO_PROXY=${NO_PROXY:-}
+      - API_BASE_URL=${API_BASE_URL:-}
+      - OPENAI_BASE_URL=${OPENAI_BASE_URL:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - MOONSHOT_API_KEY=${MOONSHOT_API_KEY:-}
+      - MODEL_NAME=${MODEL_NAME:-}
+      - TASK_API_TOKENS_JSON=${TASK_API_TOKENS_JSON:-}
+      - TASK_SECRET_SOURCES_JSON=${TASK_SECRET_SOURCES_JSON:-}
+      - TASK_SECRET_SOURCES_FILE=${TASK_SECRET_SOURCES_FILE:-}
+      - MAX_UPLOAD_BYTES=26214400
+      - MAX_QUEUED_RUNS=20
+      - MAX_RUNS_PER_USER=50
+      - RUN_TTL_HOURS=168
+      - MAX_COMPLETED_RUNS=100
+      - MAX_TASK_MEMORY_MB=4096
+      - MAX_TASK_CPU_SECONDS=7200
+      - WORKER_LEASE_SECONDS=120
+      - WORKER_STALE_SECONDS=30
+    ports:
+      - "5050:5050"
+    volumes:
+      - ./runs:/app/runs
+      - ./demo_runtime:/app/autoresearch:ro
+      - ./prediction:/app/prediction:ro
+      - ../autoresearch:/app/source_autoresearch:ro
+    mem_limit: 4g
+    cpus: 2.0
+    restart: unless-stopped
+
+  orchestrator:
+    build:
+      context: .
+      dockerfile: Dockerfile.orchestrator
+    container_name: pm-orchestrator
+    environment:
+      - SOURCE_AUTORESEARCH_DIR=/app/source_autoresearch
+      - HTTP_PROXY=http://host.docker.internal:7890
+      - HTTPS_PROXY=http://host.docker.internal:7890
+      - NO_PROXY=${NO_PROXY:-}
+      - API_BASE_URL=${API_BASE_URL:-}
+      - OPENAI_BASE_URL=${OPENAI_BASE_URL:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - MOONSHOT_API_KEY=${MOONSHOT_API_KEY:-}
+      - MODEL_NAME=${MODEL_NAME:-}
+      - TASK_SECRET_SOURCES_JSON=${TASK_SECRET_SOURCES_JSON:-}
+      - TASK_SECRET_SOURCES_FILE=${TASK_SECRET_SOURCES_FILE:-}
+      - MAX_TASK_MEMORY_MB=4096
+      - MAX_TASK_CPU_SECONDS=7200
+    volumes:
+      - ./runs:/app/runs
+      - ./prediction:/app/prediction:ro
+      - ../autoresearch:/app/source_autoresearch:ro
+    mem_limit: 4g
+    cpus: 2.0
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    environment:
+      - SOURCE_AUTORESEARCH_DIR=/app/source_autoresearch
+      - HTTP_PROXY=http://host.docker.internal:7890
+      - HTTPS_PROXY=http://host.docker.internal:7890
+      - NO_PROXY=${NO_PROXY:-}
+      - API_BASE_URL=${API_BASE_URL:-}
+      - OPENAI_BASE_URL=${OPENAI_BASE_URL:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - MOONSHOT_API_KEY=${MOONSHOT_API_KEY:-}
+      - MODEL_NAME=${MODEL_NAME:-}
+      - TASK_SECRET_SOURCES_JSON=${TASK_SECRET_SOURCES_JSON:-}
+      - TASK_SECRET_SOURCES_FILE=${TASK_SECRET_SOURCES_FILE:-}
+      - MAX_TASK_MEMORY_MB=4096
+      - MAX_TASK_CPU_SECONDS=7200
+      - WORKER_POLL_SECONDS=5
+      - WORKER_LEASE_SECONDS=120
+      - WORKER_STALE_SECONDS=30
+    volumes:
+      - ./runs:/app/runs
+      - ./prediction:/app/prediction:ro
+      - ../autoresearch:/app/source_autoresearch:ro
+    mem_limit: 4g
+    cpus: 2.0
+    restart: unless-stopped

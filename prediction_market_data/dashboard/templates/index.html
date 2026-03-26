@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>预测市场自动研究 Dashboard</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+</head>
+<body>
+<div class="top">
+  <h1>预测市场自动研究 Dashboard</h1>
+  <div class="right">
+    <div class="run-picker">
+      <label for="runSelect">快速切换</label>
+      <select id="runSelect"><option value="">加载中...</option></select>
+    </div>
+    <div class="auth-box">
+      <input id="authTokenInput" type="password" placeholder="API Token">
+      <button id="authTokenBtn" class="btn secondary" type="button">保存 Token</button>
+    </div>
+    <span id="currentRunText" class="gauge-text">当前任务: —</span>
+    <span id="statusBadge" class="badge b-idle">空闲</span>
+    <span id="progressText" style="font-size:15px;color:#8b949e"></span>
+    <div class="token-gauge">
+      <span class="gauge-text">Token:</span>
+      <div class="gauge-bar"><div class="gauge-fill" id="gaugeFill" style="width:0%"></div></div>
+      <span id="tokenNum" class="gauge-text">0 / 500K</span>
+    </div>
+    <span class="gauge-text">调用: <b id="callNum">0</b> | 错误: <b id="errNum" style="color:#f85149">0</b></span>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stat"><div class="label">资金余额</div><div class="val v-blue" id="sBankroll">$10,000</div><div class="sub" id="sBankrollSub">初始资金</div></div>
+  <div class="stat"><div class="label">累计盈亏</div><div class="val" id="sPnl">$0</div><div class="sub" id="sPnlPct">0%</div></div>
+  <div class="stat"><div class="label">胜率</div><div class="val v-blue" id="sWinRate">0%</div><div class="sub" id="sWinLoss">0胜 / 0负</div></div>
+  <div class="stat"><div class="label">适应度</div><div class="val v-yellow" id="sFitness">—</div><div class="sub">优化目标</div></div>
+  <div class="stat"><div class="label">输入 Token</div><div class="val v-blue" id="sPromptTok">0</div><div class="sub">Prompt</div></div>
+  <div class="stat"><div class="label">输出 Token</div><div class="val v-blue" id="sCompTok">0</div><div class="sub">Completion</div></div>
+</div>
+
+<div class="main">
+  <div class="left">
+    <div class="panel-title">任务提交</div>
+    <div class="task-submit">
+      <form id="taskForm" class="task-form">
+        <div class="task-section">
+          <div class="section-head">
+            <div>
+              <div class="section-title">1. 选择数据文件</div>
+              <div class="section-copy">先选文件，再做预检查或提交。选中后会显示文件名和大小，避免误选。</div>
+            </div>
+            <button id="taskDatasetClearBtn" class="btn secondary" type="button">清空文件</button>
+          </div>
+          <div id="taskDatasetPicker" class="file-picker">
+            <input id="taskDataset" name="dataset" type="file" accept=".json,.csv" required>
+            <div id="taskDatasetMeta" class="file-picker-meta">
+              <span class="file-pill">尚未选择文件</span>
+              <span class="file-pill muted">支持 .json / .csv</span>
+            </div>
+          </div>
+        </div>
+        <div class="task-section">
+          <div class="section-head">
+            <div>
+              <div class="section-title">2. 基本配置</div>
+              <div class="section-copy">默认只需要任务名、迭代数和样本数。其余参数折叠到高级配置里。</div>
+            </div>
+          </div>
+          <div class="preset-row">
+            <button class="btn secondary preset-btn" type="button" data-preset="smoke">最小试跑</button>
+            <button class="btn secondary preset-btn" type="button" data-preset="qa">快速 QA</button>
+            <button class="btn secondary preset-btn" type="button" data-preset="full">完整迭代</button>
+          </div>
+          <div class="quick-grid" style="margin-top:10px">
+            <div class="task-field">
+              <label for="taskRunName">任务名</label>
+              <input id="taskRunName" name="run_name" type="text" placeholder="如 qa-full-iteration">
+            </div>
+            <div class="task-field">
+              <label for="taskMaxIterations">最大迭代</label>
+              <input id="taskMaxIterations" name="max_iterations" type="number" value="10" min="1" max="200">
+            </div>
+            <div class="task-field">
+              <label for="taskSampleSize">样本数</label>
+              <input id="taskSampleSize" name="sample_size" type="number" value="200" min="1" max="200">
+            </div>
+          </div>
+          <div class="task-toggle-grid" style="margin-top:10px">
+            <label class="task-switch" for="taskRealExecution">
+              <input id="taskRealExecution" name="real_execution" type="checkbox" value="1">
+              <span>
+                <span class="task-switch-title">真实执行</span>
+                <span class="task-switch-copy">按真实执行模式提交当前 run spec，适合正式回放或预算审查。</span>
+              </span>
+            </label>
+            <label class="task-switch" for="taskProbeModel">
+              <input id="taskProbeModel" name="probe_model" type="checkbox" value="1">
+              <span>
+                <span class="task-switch-title">提交前 Probe</span>
+                <span class="task-switch-copy">先检查模型连通性和数据可读性，再正式提交任务。</span>
+              </span>
+            </label>
+          </div>
+          <details class="advanced-settings" style="margin-top:12px">
+            <summary>高级配置（通常不用改）</summary>
+            <div class="advanced-body">
+              <div class="task-grid">
+                <div class="task-field">
+                  <label for="taskUserId">用户 ID</label>
+                  <input id="taskUserId" name="user_id" type="text" value="local">
+                </div>
+                <div class="task-field">
+                  <label for="taskTenantId">租户 ID</label>
+                  <input id="taskTenantId" name="tenant_id" type="text" value="default">
+                </div>
+                <div class="task-field">
+                  <label for="taskAllowedAxes">允许搜索轴</label>
+                  <input id="taskAllowedAxes" name="allowed_axes" type="text" value="CONFIDENCE_THRESHOLD,BET_SIZING,MAX_BET_FRACTION,PROMPT_FACTORS">
+                </div>
+                <div class="task-field">
+                  <label for="taskPerEvalBudget">单轮 Token 预算</label>
+                  <input id="taskPerEvalBudget" name="per_eval_token_budget" type="number" value="150000" min="1">
+                </div>
+                <div class="task-field">
+                  <label for="taskTotalBudget">总 Token 预算</label>
+                  <input id="taskTotalBudget" name="total_token_budget" type="number" value="0" min="0">
+                </div>
+                <div class="task-field">
+                  <label for="taskRetentionHours">保留时长（小时）</label>
+                  <input id="taskRetentionHours" name="retention_hours" type="number" value="168" min="1">
+                </div>
+                <div class="task-field">
+                  <label for="taskEnvRefs">环境引用</label>
+                  <input id="taskEnvRefs" name="env_refs" type="text" placeholder="OPENAI_API_KEY,HTTPS_PROXY">
+                </div>
+                <div class="task-field">
+                  <label for="taskSecretRefs">Secret 引用</label>
+                  <input id="taskSecretRefs" name="secret_refs" type="text" placeholder="openai-prod,moonshot-prod">
+                </div>
+              </div>
+              <div class="task-help" style="margin-top:10px">`env_refs` 只放非敏感运行参数；模型 key 优先通过 `secret_refs` 解析，不直接上传 secret 明文。</div>
+            </div>
+          </details>
+        </div>
+        <div class="task-actions">
+          <button id="taskPreflightBtn" class="btn secondary" type="button">预检查</button>
+          <button id="taskSubmitBtn" class="btn" type="submit">提交任务</button>
+          <button id="taskStopBtn" class="btn secondary" type="button">停止当前任务</button>
+          <button id="taskCleanupBtn" class="btn secondary" type="button">清理过期任务</button>
+        </div>
+        <div id="taskMessage" class="task-message">等待任务提交。</div>
+      </form>
+    </div>
+    <div class="panel-title">任务列表</div>
+    <div class="run-list-panel">
+      <div class="run-list-toolbar">
+        <div id="runListSummary" class="run-list-summary">正在加载任务列表...</div>
+        <button id="runListRefreshBtn" class="btn secondary" type="button">刷新列表</button>
+      </div>
+      <div id="runListPanel" class="run-list"><div class="empty">暂无任务</div></div>
+    </div>
+    <div class="panel-title">任务详情</div>
+    <div class="task-detail" id="taskDetailPanel"><div class="empty">等待任务选择...</div></div>
+    <div class="panel-title">产物下载</div>
+    <div class="artifact-panel" id="artifactPanel"><div class="empty">暂无产物</div></div>
+    <div class="panel-title">当前策略配置</div>
+    <div class="params" id="paramsPanel"><div class="empty">等待实验启动...</div></div>
+    <div class="panel-title">MainAgent 摘要</div>
+    <div class="orchestrator" id="orchestratorPanel"><div class="empty">等待 orchestrator 启动...</div></div>
+    <div class="panel-title">当前任务实验结果</div>
+    <div id="expList"><div class="empty">暂无实验记录</div></div>
+  </div>
+
+  <div class="right-panel">
+    <div class="chart-row">
+      <div class="chart-box"><h3>资金曲线</h3><canvas id="pnlChart"></canvas></div>
+      <div class="chart-box"><h3>Token 消耗（按实验）</h3><canvas id="tokenChart"></canvas></div>
+    </div>
+    <div class="focus-panel">
+      <div class="focus-header">迭代细节与前后对比</div>
+      <div class="iter-summary-bar" id="iterationSummaryBar">
+        <div class="iter-summary-card"><h4>Champion</h4><div>等待实验迭代...</div></div>
+        <div class="iter-summary-card"><h4>Challenger</h4><div>等待实验迭代...</div></div>
+        <div class="iter-summary-card"><h4>Gate Outcome</h4><div>等待实验迭代...</div></div>
+      </div>
+      <div class="compare-wrap">
+        <div class="compare-head">多实验对照</div>
+        <div class="compare-grid" id="comparisonPanel">
+          <div class="compare-card"><h4>Best Validation</h4><div class="big">等待实验结果...</div></div>
+          <div class="compare-card"><h4>Status Mix</h4><div class="big">等待实验结果...</div></div>
+          <div class="compare-card"><h4>Recent Runs</h4><div class="big">等待实验结果...</div></div>
+        </div>
+      </div>
+      <div class="iterations" id="iterationPanel"><div class="empty">等待实验迭代...</div></div>
+    </div>
+    <div class="stream">
+      <div class="stream-header">
+        <span>实时推理流 <span id="streamDot" style="color:#3fb950"></span></span>
+        <span id="streamCount" style="color:#6e7681"></span>
+      </div>
+      <div class="stream-body" id="streamBody"><div class="empty">等待实验启动...</div></div>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="{{ url_for('static', filename='js/app-shell.js') }}"></script>
+</body>
+</html>
