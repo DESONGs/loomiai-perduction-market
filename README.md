@@ -1,4 +1,4 @@
-# OpenClaw Prediction Market Lab
+#  Prediction Market Autoreasearch
 
 一个面向黑客松展示的预测市场研究项目：把历史市场数据整理成标准化评测集，用 LLM 生成交易判断，并通过可视化面板管理实验运行、结果和产物。
 
