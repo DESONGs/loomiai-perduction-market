@@ -142,6 +142,24 @@ examples/prediction-market/
 python -m unittest discover tests
 ```
 
+## PyPI 发布流程
+
+仓库已经补上首版 `PyPI` 发包链路，包括：
+
+- [package-check.yml](/tmp/loomiai-perduction-market-readonly/.github/workflows/package-check.yml)
+- [publish-pypi.yml](/tmp/loomiai-perduction-market-readonly/.github/workflows/publish-pypi.yml)
+- [pypi-release.md](/tmp/loomiai-perduction-market-readonly/docs/pypi-release.md)
+
+本地发包验证命令：
+
+```bash
+python3 -m pip install --upgrade build twine
+python3 -m build
+python3 -m twine check dist/*
+```
+
+正式发布建议先走 `TestPyPI`，再走 `PyPI`。
+
 ## 历史能力
 
 如果你仍然想使用原有的预测市场 `Dashboard` 形态，历史代码仍保留在：
