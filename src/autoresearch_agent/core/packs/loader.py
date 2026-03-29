@@ -5,12 +5,12 @@ import json
 from pathlib import Path
 from typing import Any, Iterable
 
+import autoresearch_agent.packs as builtin_packs
+
 from .schema import PackManifest, build_default_research_spec, normalize_pack_manifest
 
 
-REPO_ROOT = Path(__file__).resolve().parents[4]
-PACKS_ROOT = REPO_ROOT / "src" / "autoresearch_agent" / "packs"
-EXAMPLES_ROOT = REPO_ROOT / "examples"
+PACKS_ROOT = Path(builtin_packs.__file__).resolve().parent
 
 
 def _strip_comment_line(line: str) -> str:
