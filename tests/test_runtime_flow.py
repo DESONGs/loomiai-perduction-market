@@ -242,6 +242,24 @@ class RuntimeFlowTests(unittest.TestCase):
             self.assertFalse((run.run_dir / "artifacts").exists())
             self.assertTrue((run.run_dir / "runtime-artifacts").exists())
 
+    def test_get_run_stays_within_configured_runs_dir(self) -> None:
+        with tempfile.TemporaryDirectory() as tempdir:
+            root = Path(tempdir)
+            spec_path = self._write_sample_project(root)
+            manager = RuntimeManager(root)
+            run = manager.run(spec_path)
+
+            stray_root = root / "nested" / ".autoresearch" / "runs" / run.run_id
+            stray_root.mkdir(parents=True, exist_ok=True)
+            (stray_root / "run_manifest.json").write_text(
+                json.dumps({"run_id": run.run_id, "status": "failed"}, ensure_ascii=False),
+                encoding="utf-8",
+            )
+
+            resolved = manager.get_run(run.run_id)
+            self.assertEqual(resolved.run_dir, run.run_dir)
+            self.assertEqual(resolved.status, "finished")
+
     def test_json_formatted_research_yaml_runs(self) -> None:
         with tempfile.TemporaryDirectory() as tempdir:
             root = Path(tempdir)

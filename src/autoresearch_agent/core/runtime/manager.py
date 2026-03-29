@@ -15,6 +15,7 @@ from ..strategy import CONFIG_DEFAULTS, apply_config_to_strategy_text, build_str
 from .lifecycle import RuntimeStatus
 from .spec import RuntimeSpecError, load_runtime_spec, normalize_runtime_spec, validate_runtime_spec
 from .state_store import atomic_write_json, ensure_dir, read_json
+from ..paths import project_file_path
 
 
 StrategyFn = Callable[[dict[str, Any], dict[str, Any]], dict[str, Any]]
@@ -296,10 +297,17 @@ class RuntimeManager:
 
     def _candidate_roots(self) -> list[Path]:
         roots: list[Path] = []
-        default_root = (self.project_root / ".autoresearch" / "runs").resolve()
-        roots.append(default_root)
-        for child in self.project_root.rglob("run_manifest.json"):
-            roots.append(child.parent)
+        spec_path = project_file_path(self.project_root)
+        if spec_path.exists():
+            try:
+                spec = load_runtime_spec(spec_path)
+            except Exception:
+                spec = {}
+            configured_root = self._runtime_root(spec) if isinstance(spec, dict) and spec else None
+            if configured_root is not None:
+                roots.append(configured_root)
+        if not roots:
+            roots.append((self.project_root / ".autoresearch" / "runs").resolve())
         return roots
 
     def status(self, run_id: str) -> dict[str, Any]:
