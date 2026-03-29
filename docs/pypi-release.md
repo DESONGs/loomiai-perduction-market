@@ -89,6 +89,7 @@ Use the GitHub Actions workflow:
 
 - Workflow: `publish-pypi`
 - Trigger: `workflow_dispatch`
+- Branch: `main`
 - Input: `repository = testpypi`
 
 Then verify install from TestPyPI:
@@ -116,7 +117,7 @@ The workflow will:
 - run `twine check`
 - publish to PyPI through trusted publishing
 
-You can also manually dispatch the workflow with:
+You can also manually dispatch the workflow from `main` with:
 
 - `repository = pypi`
 
