@@ -29,6 +29,9 @@ dependencies = []
 Homepage = "https://github.com/DESONGs/loomiai-perduction-market"
 Repository = "https://github.com/DESONGs/loomiai-perduction-market"
 Issues = "https://github.com/DESONGs/loomiai-perduction-market/issues"
+Changelog = "https://github.com/DESONGs/loomiai-perduction-market/blob/main/CHANGELOG.md"
+Security = "https://github.com/DESONGs/loomiai-perduction-market/blob/main/SECURITY.md"
+Documentation = "https://github.com/DESONGs/loomiai-perduction-market/blob/main/README.md"
 
 [project.optional-dependencies]
 mcp = ["fastmcp>=2.14.0"]

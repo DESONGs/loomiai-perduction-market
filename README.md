@@ -1,42 +1,63 @@
 # Prediction Market Autoresearch
 
-这个仓库现在同时包含两条能力线：
+这个仓库当前同时包含两条能力线：
 
 - 旧版预测市场实验与 `Dashboard`
 - 新版可安装本地包 `autoresearch-agent`
 
-新版目标是把原来的预测市场 `auto research` 抽成一个本地可安装的 `research agent`，支持：
+`autoresearch-agent` 的目标，是把原来的预测市场 `auto research` 抽成一个可本地安装、可复用、可扩展的 `research agent`。用户可以用自己的数据、自己的优化方向，以及自己的约束条件来驱动迭代。
 
-- 用户本地初始化研究项目
-- 用户自定义数据源和优化方向
-- 基于 `pack` 的领域能力复用
+## 核心能力
+
+- 本地初始化研究项目
+- 自定义数据源、目标函数和搜索轴
+- 基于 `pack` 复用领域能力
 - 通过 CLI 或最小 `MCP` 外壳调用同一套运行时
+- 为后续 `PyPI` / 开源发布保留标准打包与发布路径
 
-## 新版目录
+## 仓库结构
 
 ```text
 src/autoresearch_agent/    可安装本地包
 examples/                  示例项目
 prediction_market_data/    旧版 Dashboard / worker / runtime
 autoresearch/              旧版策略实验目录
-docs/                      规划与演进文档
+docs/                      规划与发布文档
 ```
 
-## 安装与本地使用
+## 安装
 
-### 1. 以开发模式安装
+### 从源码安装
 
 ```bash
 pip install -e .
 ```
 
-### 2. 初始化一个研究项目
+### 按能力安装可选依赖
+
+```bash
+pip install -e ".[yaml]"
+pip install -e ".[mcp]"
+pip install -e ".[dev]"
+```
+
+### 未来从 `PyPI` 安装
+
+正式发布后可直接使用：
+
+```bash
+pip install autoresearch-agent
+```
+
+## 快速开始
+
+### 1. 初始化研究项目
 
 ```bash
 python -m autoresearch_agent init ./demo-project --pack prediction_market --data-source ./dataset.json
 ```
 
-初始化后项目目录会包含：
+初始化后目录结构：
 
 ```text
 demo-project/
@@ -48,32 +69,32 @@ demo-project/
   .autoresearch/
 ```
 
-### 3. 校验项目
+### 2. 校验配置
 
 ```bash
 python -m autoresearch_agent validate ./demo-project
 ```
 
-### 4. 运行一轮本地迭代
+### 3. 启动一次本地迭代
 
 ```bash
 python -m autoresearch_agent run ./demo-project
 ```
 
-### 5. 查看状态与产物
+### 4. 查看运行状态和产物
 
 ```bash
 python -m autoresearch_agent status <run_id> --project-root ./demo-project
 python -m autoresearch_agent artifacts <run_id> --project-root ./demo-project
 ```
 
-### 6. 从已有结果继续迭代
+### 5. 基于已有运行继续迭代
 
 ```bash
 python -m autoresearch_agent continue <run_id> --project-root ./demo-project
 ```
 
-## 支持的首版命令
+## CLI 命令
 
 - `init`
 - `validate`
@@ -87,9 +108,7 @@ python -m autoresearch_agent continue <run_id> --project-root ./demo-project
 
 ## `pack` 机制
 
-首版内置 `prediction_market` 这个 `pack`。
-
-它定义了：
+首版内置 `prediction_market` 这个 `pack`，负责定义：
 
 - 数据适配方式
 - 默认目标函数
@@ -101,13 +120,13 @@ python -m autoresearch_agent continue <run_id> --project-root ./demo-project
 
 ## 最小 `MCP` 外壳
 
-仓库内已经提供一个不依赖第三方 `MCP` 框架的最小 stdio server：
+仓库中已经提供一个不依赖第三方 `MCP` 框架的最小 stdio server：
 
 ```bash
 python -m autoresearch_agent mcp serve --project-root ./demo-project
 ```
 
-它当前暴露的最小方法集包括：
+当前暴露的最小方法集包括：
 
 - `ping`
 - `list_packs`
@@ -117,7 +136,7 @@ python -m autoresearch_agent mcp serve --project-root ./demo-project
 - `get_run_status`
 - `list_artifacts`
 
-## 示例
+## 示例项目
 
 可以直接参考：
 
@@ -125,9 +144,29 @@ python -m autoresearch_agent mcp serve --project-root ./demo-project
 examples/prediction-market/
 ```
 
-## 开发状态
+## 验证
 
-当前 MVP 已经具备这些能力：
+当前基础验证命令：
+
+```bash
+python -m unittest discover tests
+python -m build --no-isolation
+python -m twine check dist/*
+```
+
+## 发布与开源文档
+
+- 发布流程：[`docs/pypi-release.md`](docs/pypi-release.md)
+- 变更记录：[`CHANGELOG.md`](CHANGELOG.md)
+- 贡献指南：[`CONTRIBUTING.md`](CONTRIBUTING.md)
+- 安全策略：[`SECURITY.md`](SECURITY.md)
+- 社区行为准则：[`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md)
+
+正式发包建议先走 `TestPyPI`，再走生产 `PyPI`。
+
+## 当前状态
+
+当前 MVP 已具备：
 
 - `research.yaml` 规格与校验
 - 本地项目 scaffold
@@ -135,30 +174,7 @@ examples/prediction-market/
 - 本地 runtime：`run/status/artifacts/continue`
 - CLI 外壳
 - 最小 `MCP` 外壳
-
-当前自动化验证：
-
-```bash
-python -m unittest discover tests
-```
-
-## PyPI 发布流程
-
-仓库已经补上首版 `PyPI` 发包链路，包括：
-
-- [package-check.yml](/tmp/loomiai-perduction-market-readonly/.github/workflows/package-check.yml)
-- [publish-pypi.yml](/tmp/loomiai-perduction-market-readonly/.github/workflows/publish-pypi.yml)
-- [pypi-release.md](/tmp/loomiai-perduction-market-readonly/docs/pypi-release.md)
-
-本地发包验证命令：
-
-```bash
-python3 -m pip install --upgrade build twine
-python3 -m build
-python3 -m twine check dist/*
-```
-
-正式发布建议先走 `TestPyPI`，再走 `PyPI`。
+- `PyPI` 打包与发布工作流
 
 ## 历史能力
 
