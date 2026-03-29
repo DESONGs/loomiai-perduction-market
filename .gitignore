@@ -10,6 +10,9 @@ __pycache__/
 .ipynb_checkpoints/
 .venv/
 venv/
+build/
+dist/
+*.egg-info/
 
 prediction_market_data/.claude/
 prediction_market_data/.venv/

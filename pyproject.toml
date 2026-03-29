@@ -11,18 +11,48 @@ requires-python = ">=3.10"
 authors = [
   { name = "OpenAI Codex" },
 ]
+keywords = ["agent", "research", "mcp", "prediction-market", "automation"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
 dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/DESONGs/loomiai-autoresearch"
+Repository = "https://github.com/DESONGs/loomiai-autoresearch"
+Issues = "https://github.com/DESONGs/loomiai-autoresearch/issues"
+Changelog = "https://github.com/DESONGs/loomiai-autoresearch/blob/main/CHANGELOG.md"
+Security = "https://github.com/DESONGs/loomiai-autoresearch/blob/main/SECURITY.md"
+Documentation = "https://github.com/DESONGs/loomiai-autoresearch/blob/main/README.md"
 
 [project.optional-dependencies]
 mcp = ["fastmcp>=2.14.0"]
 yaml = ["PyYAML>=6.0.2"]
-dev = ["pytest>=8.3.0"]
+dev = ["build>=1.2.2", "pytest>=8.3.0", "twine>=5.1.1"]
 
 [project.scripts]
 ar = "autoresearch_agent.cli.main:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
+include-package-data = true
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+"autoresearch_agent.packs.prediction_market" = [
+  "pack.yaml",
+  "axes.yaml",
+  "prompts/*.txt",
+  "templates/*.yaml",
+  "templates/*.py",
+]
