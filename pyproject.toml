@@ -36,8 +36,6 @@ Security = "https://github.com/DESONGs/loomiai-autoresearch/blob/main/SECURITY.m
 Documentation = "https://github.com/DESONGs/loomiai-autoresearch/blob/main/README.md"
 
 [project.optional-dependencies]
-mcp = ["fastmcp>=2.14.0"]
-yaml = ["PyYAML>=6.0.2"]
 dev = ["build>=1.2.2", "pytest>=8.3.0", "twine>=5.1.1"]
 
 [project.scripts]

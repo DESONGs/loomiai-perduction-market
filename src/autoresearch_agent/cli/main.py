@@ -51,7 +51,7 @@ def cmd_run(args: argparse.Namespace) -> int:
 
 
 def cmd_continue(args: argparse.Namespace) -> int:
-    return _print(continue_project_run(args.project_root, args.run_id))
+    return _print(continue_project_run(args.project_root, args.run_id, next_run_id=args.next_run_id or None))
 
 
 def cmd_status(args: argparse.Namespace) -> int:
@@ -101,6 +101,7 @@ def build_parser() -> argparse.ArgumentParser:
     continue_parser = subparsers.add_parser("continue", help="continue from an existing run")
     continue_parser.add_argument("run_id")
     continue_parser.add_argument("--project-root", default=".")
+    continue_parser.add_argument("--next-run-id", default="")
     continue_parser.set_defaults(handler=cmd_continue)
 
     status_parser = subparsers.add_parser("status", help="show run status")
@@ -126,7 +127,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     mcp_parser = subparsers.add_parser("mcp", help="MCP utilities")
     mcp_subparsers = mcp_parser.add_subparsers(dest="mcp_command")
-    mcp_serve_parser = mcp_subparsers.add_parser("serve", help="serve a minimal stdio MCP facade")
+    mcp_serve_parser = mcp_subparsers.add_parser("serve", help="serve the stdio MCP server")
     mcp_serve_parser.add_argument("--project-root", default=".")
     mcp_serve_parser.set_defaults(handler=cmd_mcp_serve)
 

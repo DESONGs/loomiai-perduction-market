@@ -5,6 +5,7 @@ from typing import Any
 
 from .loader import dump_document, find_pack_manifest, load_document
 from .schema import ResearchSpec, build_default_research_spec
+from autoresearch_agent.core.spec.research_config import dump_research_yaml
 
 
 DEFAULT_PROJECT_DIRS = [
@@ -35,7 +36,7 @@ def default_research_spec(
 
 
 def render_research_spec(spec: ResearchSpec) -> str:
-    return dump_document(spec.to_dict())
+    return dump_research_yaml(spec.to_dict())
 
 
 def render_pack_template(path: Path, placeholders: dict[str, str] | None = None) -> str:

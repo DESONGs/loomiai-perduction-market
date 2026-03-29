@@ -1,0 +1,134 @@
+[
+  {
+    "market_id": "pm-001",
+    "question": "Will the Titans win Super Bowl 2026?",
+    "outcomes": ["Yes", "No"],
+    "outcome_prices": [0.0, 1.0],
+    "final_resolution": "No",
+    "final_resolution_index": 1,
+    "last_trade_price": 1.0,
+    "price_signals": {
+      "1h_change": -0.001,
+      "1d_change": -0.001,
+      "1w_change": -0.003
+    },
+    "volume": 70848160.38,
+    "context": {
+      "category": "sports",
+      "subcategory": "nfl",
+      "event_title": "Super Bowl Champion 2026",
+      "liquidity": 0.0,
+      "neg_risk": true
+    }
+  },
+  {
+    "market_id": "pm-002",
+    "question": "Will the Raiders win Super Bowl 2026?",
+    "outcomes": ["Yes", "No"],
+    "outcome_prices": [0.0, 1.0],
+    "final_resolution": "No",
+    "final_resolution_index": 1,
+    "last_trade_price": 1.0,
+    "price_signals": {
+      "1h_change": 0.0,
+      "1d_change": -0.001,
+      "1w_change": -0.002
+    },
+    "volume": 50242113.93,
+    "context": {
+      "category": "sports",
+      "subcategory": "nfl",
+      "event_title": "Super Bowl Champion 2026",
+      "liquidity": 0.0,
+      "neg_risk": true
+    }
+  },
+  {
+    "market_id": "pm-003",
+    "question": "Will Bitcoin close above $130k on December 31, 2026?",
+    "outcomes": ["Yes", "No"],
+    "outcome_prices": [0.42, 0.58],
+    "final_resolution": "Yes",
+    "final_resolution_index": 0,
+    "last_trade_price": 0.42,
+    "price_signals": {
+      "1h_change": 0.01,
+      "1d_change": 0.04,
+      "1w_change": 0.08
+    },
+    "volume": 1824000.5,
+    "context": {
+      "category": "Crypto",
+      "subcategory": "btc",
+      "event_title": "Bitcoin Year-End Price 2026",
+      "liquidity": 185000.0,
+      "neg_risk": false
+    }
+  },
+  {
+    "market_id": "pm-004",
+    "question": "Will the US avoid a government shutdown in September 2026?",
+    "outcomes": ["Yes", "No"],
+    "outcome_prices": [0.61, 0.39],
+    "final_resolution": "Yes",
+    "final_resolution_index": 0,
+    "last_trade_price": 0.61,
+    "price_signals": {
+      "1h_change": 0.0,
+      "1d_change": 0.02,
+      "1w_change": 0.05
+    },
+    "volume": 964200.25,
+    "context": {
+      "category": "US-current-affairs",
+      "subcategory": "budget",
+      "event_title": "US Government Shutdown 2026",
+      "liquidity": 44000.0,
+      "neg_risk": false
+    }
+  },
+  {
+    "market_id": "pm-005",
+    "question": "Will Ethereum spot ETF net inflows exceed $10B in 2026?",
+    "outcomes": ["Yes", "No"],
+    "outcome_prices": [0.37, 0.63],
+    "final_resolution": "No",
+    "final_resolution_index": 1,
+    "last_trade_price": 0.37,
+    "price_signals": {
+      "1h_change": -0.003,
+      "1d_change": -0.01,
+      "1w_change": 0.02
+    },
+    "volume": 556000.0,
+    "context": {
+      "category": "Business",
+      "subcategory": "etf",
+      "event_title": "Ethereum ETF Flows 2026",
+      "liquidity": 12000.0,
+      "neg_risk": false
+    }
+  },
+  {
+    "market_id": "pm-006",
+    "question": "Will Ukraine regain control of a major occupied city in 2026?",
+    "outcomes": ["Yes", "No"],
+    "outcome_prices": [0.29, 0.71],
+    "final_resolution": "No",
+    "final_resolution_index": 1,
+    "last_trade_price": 0.29,
+    "price_signals": {
+      "1h_change": 0.0,
+      "1d_change": -0.01,
+      "1w_change": -0.03
+    },
+    "volume": 732100.75,
+    "context": {
+      "category": "Ukraine & Russia",
+      "subcategory": "territory",
+      "event_title": "Ukraine Major City Recovery 2026",
+      "liquidity": 52000.0,
+      "neg_risk": false
+    }
+  }
+]

@@ -33,6 +33,9 @@ class ProjectScaffoldTests(unittest.TestCase):
             self.assertTrue((root / ".autoresearch" / "runs").exists())
             self.assertTrue((root / ".autoresearch" / "cache").exists())
             self.assertTrue((root / ".autoresearch" / "state").exists())
+            strategy_text = (root / "workspace" / "strategy.py").read_text(encoding="utf-8")
+            self.assertIn("def strategy", strategy_text)
+            self.assertIn("CONFIDENCE_THRESHOLD", strategy_text)
 
             loaded = load_research_spec(config_path)
             self.assertEqual(loaded["project"]["name"], "demo-project")

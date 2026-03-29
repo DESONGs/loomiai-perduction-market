@@ -14,18 +14,7 @@ build/
 dist/
 *.egg-info/
 
-prediction_market_data/.claude/
-prediction_market_data/.venv/
-prediction_market_data/runs/
-prediction_market_data/prediction/
-!prediction_market_data/prediction/eval_markets.json
-prediction_market_data/*.log
-
-autoresearch/*.log
-autoresearch/*.jsonl
-autoresearch/*.tsv
-autoresearch/*.png
-autoresearch/*.ipynb
-
 release/
+tmp/
 *.zip
+**/.autoresearch/
