@@ -55,9 +55,11 @@ class PackLoaderTests(unittest.TestCase):
             self.assertIn("workspace/strategy.py", created)
             self.assertIn(".autoresearch/state/pack_manifest.json", created)
             research_text = research_path.read_text(encoding="utf-8")
+            strategy_text = strategy_path.read_text(encoding="utf-8")
             self.assertIn("demo-project", research_text)
             self.assertIn("prediction_market", research_text)
             self.assertIn("./datasets/eval_markets.json", research_text)
+            self.assertIn("def strategy", strategy_text)
 
     def test_default_research_spec_uses_pack_axes(self) -> None:
         spec = default_research_spec(

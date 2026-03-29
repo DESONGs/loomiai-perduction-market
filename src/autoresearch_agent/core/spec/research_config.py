@@ -416,7 +416,8 @@ def validate_research_spec(payload: Mapping[str, Any]) -> dict[str, Any]:
     _ensure_int(errors, "data.sampling.seed", sampling.get("seed"), minimum=0, maximum=2**31 - 1)
     _ensure_str(errors, "data.split.mode", split.get("mode"))
     for field in ("train_ratio", "validation_ratio", "holdout_ratio"):
-        _ensure_float(errors, f"data.split.{field}", split.get(field), minimum=0.0, maximum=1.0)
+        if split.get(field) is not None:
+            _ensure_float(errors, f"data.split.{field}", split.get(field), minimum=0.0, maximum=1.0)
 
     _ensure_str(errors, "objective.primary", objective.get("primary"))
     secondary = _list_of_strings(objective.get("secondary"))
@@ -461,7 +462,7 @@ def validate_research_spec(payload: Mapping[str, Any]) -> dict[str, Any]:
     _ensure_int(errors, "constraints.per_eval_token_budget", constraints.get("per_eval_token_budget"), minimum=1, maximum=5_000_000)
     _ensure_int(errors, "constraints.max_completion_tokens", constraints.get("max_completion_tokens"), minimum=1, maximum=32_000)
     _ensure_int(errors, "constraints.eval_timeout_seconds", constraints.get("eval_timeout_seconds"), minimum=1, maximum=86_400)
-    _ensure_int(errors, "constraints.max_runtime_minutes", constraints.get("max_runtime_minutes"), minimum=1, maximum=10_080)
+    _ensure_int(errors, "constraints.max_runtime_minutes", constraints.get("max_runtime_minutes"), minimum=0, maximum=10_080)
     _ensure_int(errors, "constraints.max_memory_mb", constraints.get("max_memory_mb"), minimum=1, maximum=262_144)
     _ensure_int(errors, "constraints.max_cpu_seconds", constraints.get("max_cpu_seconds"), minimum=1, maximum=86_400)
     _ensure_bool(errors, "constraints.allow_network", constraints.get("allow_network"))
@@ -491,10 +492,16 @@ def validate_research_spec(payload: Mapping[str, Any]) -> dict[str, Any]:
     _ensure_type(errors, "pack_config", pack_config, dict)
 
     if isinstance(split, dict):
+        def _ratio_value(name: str) -> float:
+            value = split.get(name, 0.0)
+            if value in {None, ""}:
+                return 0.0
+            return float(value)
+
         ratios = [
-            float(split.get("train_ratio", 0.0)),
-            float(split.get("validation_ratio", 0.0)),
-            float(split.get("holdout_ratio", 0.0)),
+            _ratio_value("train_ratio"),
+            _ratio_value("validation_ratio"),
+            _ratio_value("holdout_ratio"),
         ]
         if all(value >= 0 for value in ratios) and sum(ratios) > 0:
             total = round(sum(ratios), 6)
@@ -508,7 +515,11 @@ def validate_research_spec(payload: Mapping[str, Any]) -> dict[str, Any]:
 
 def load_research_spec(path: str | Path) -> dict[str, Any]:
     source_path = Path(path)
-    payload = load_yaml_text(source_path.read_text(encoding="utf-8"))
+    text = source_path.read_text(encoding="utf-8")
+    try:
+        payload = json.loads(text)
+    except json.JSONDecodeError:
+        payload = load_yaml_text(text)
     return validate_research_spec(payload)
 
 

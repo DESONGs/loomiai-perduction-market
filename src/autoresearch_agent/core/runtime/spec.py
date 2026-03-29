@@ -302,6 +302,12 @@ def validate_runtime_spec(payload: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(runtime.get("secret_refs", []), list) or any(not isinstance(item, str) for item in runtime.get("secret_refs", [])):
         errors.append("runtime.secret_refs must be list[str]")
 
+    outputs = normalized.get("outputs", {})
+    for field in ("write_patch", "write_report", "write_dataset_profile", "write_best_strategy"):
+        if field in outputs and not isinstance(outputs.get(field), bool):
+            errors.append(f"outputs.{field} must be bool")
+    _ensure_type(errors, "outputs.export_format", outputs.get("export_format"), str)
+
     if errors:
         raise RuntimeSpecError("invalid runtime spec: " + "; ".join(errors))
     return normalized
@@ -310,13 +316,10 @@ def validate_runtime_spec(payload: dict[str, Any]) -> dict[str, Any]:
 def load_runtime_spec(path: str | Path) -> dict[str, Any]:
     source = Path(path)
     text = source.read_text(encoding="utf-8")
-    if source.suffix.lower() in {".yaml", ".yml"}:
+    try:
+        payload = json.loads(text)
+    except json.JSONDecodeError:
         payload = _parse_yaml_text(text)
-    else:
-        try:
-            payload = json.loads(text)
-        except json.JSONDecodeError:
-            payload = _parse_yaml_text(text)
     if not isinstance(payload, dict):
         raise RuntimeSpecError("runtime spec must be a JSON object")
     return validate_runtime_spec(payload)

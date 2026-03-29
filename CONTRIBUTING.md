@@ -5,6 +5,7 @@
 ## 开始之前
 
 - 先阅读 [`README.md`](README.md) 了解项目定位
+- 先阅读 [`docs/runtime-architecture.md`](docs/runtime-architecture.md) 了解单一运行时结构
 - 对发布相关改动，先阅读 [`docs/pypi-release.md`](docs/pypi-release.md)
 - 提交前请确认你的变更范围清晰，并尽量让一个分支只服务一个 `PR`
 
@@ -14,12 +15,6 @@
 
 ```bash
 pip install -e ".[dev]"
-```
-
-如需测试可选能力：
-
-```bash
-pip install -e ".[yaml,mcp,dev]"
 ```
 
 ## 建议工作流
