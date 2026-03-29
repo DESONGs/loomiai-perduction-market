@@ -35,7 +35,7 @@ Create:
 In both PyPI and TestPyPI, add a trusted publisher that matches:
 
 - Owner: `DESONGs`
-- Repository: `loomiai-perduction-market`
+- Repository: `loomiai-autoresearch`
 - Workflow name: `publish-pypi`
 
 Recommended environments:
